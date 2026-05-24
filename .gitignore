@@ -1,0 +1,15 @@
+# Ignore model weight files
+*.gguf
+*.bin
+*.pt
+*.pth
+
+# Ignore python virtual environments
+venv/
+.venv/
+__pycache__/
+
+# Ignore build directories and logs
+build/
+bin/
+*.log
