@@ -13,3 +13,6 @@ __pycache__/
 build/
 bin/
 *.log
+
+# Ignore BeeLlama.cpp clone
+beellama.cpp/
