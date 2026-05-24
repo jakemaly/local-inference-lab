@@ -1,0 +1,55 @@
+[Unit]
+Description=Llama Server Service (Qwen3.6-27B Phase 3 BeeLlama Precision)
+Documentation=file:///home/hermes/club-3090/docs/%23%20Quickstart%3A%20Qwen%203.md
+After=network.target
+
+[Service]
+User=hermes
+WorkingDirectory=/home/hermes/llama
+
+# Graph optimization remains off (GGML_CUDA_GRAPH_OPT=0) as default for Qwen
+Environment="GGML_CUDA_GRAPH_OPT=0"
+
+# Explicit LD_LIBRARY_PATH prevents dynamic linker from loading conflicting libraries in /usr/local/lib
+Environment="LD_LIBRARY_PATH=/home/hermes/llama/beellama.cpp/build/bin"
+
+# Phase 3 BeeLlama Precision profile:
+#   Q5_K_S target + DFlash Q4_K_M drafter.
+#   122800 ctx, turbo4 K + turbo3_tcq V, --reasoning off.
+#   Maintains loopback-only routing on 127.0.0.1:8082 for validation.
+ExecStart=/home/hermes/llama/beellama.cpp/build/bin/llama-server \
+  -m /home/hermes/llama/models/precision/Qwen3.6-27B-Q5_K_S.gguf \
+  --spec-draft-model /home/hermes/llama/models/precision/Qwen3.6-27B-DFlash-Q4_K_M.gguf \
+  --spec-type dflash \
+  --spec-dflash-cross-ctx 1024 \
+  --spec-draft-ngl all \
+  -ngl 99 \
+  -fa on \
+  --kv-unified \
+  -b 2048 \
+  -ub 256 \
+  --ctx-size 122800 \
+  --cache-type-k turbo4 \
+  --cache-type-v turbo3_tcq \
+  --cache-ram 0 \
+  -np 1 \
+  --jinja \
+  --reasoning off \
+  --reasoning-format deepseek \
+  --temp 0.6 \
+  --top-k 20 \
+  --min-p 0.0 \
+  --port 8082 \
+  --host 127.0.0.1 \
+  --metrics \
+  --log-timestamps \
+  --log-prefix \
+  --log-colors off
+
+Restart=always
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
