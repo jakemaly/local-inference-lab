@@ -103,6 +103,4 @@ else
   echo "⚠️ Phase 2 regression checks reported issues. Inspect logs." >&2
 fi
 
-echo "=== Phase 3 Cutover SUCCESSFUL! ==="
-EOF
-,path:
+echo "=== Phase 3 Cutover SUCCESSFUL! ===",path:
