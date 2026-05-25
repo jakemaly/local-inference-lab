@@ -11,7 +11,7 @@ PRECISION_DIR="/home/hermes/llama/models/precision"
 echo "=== 1. Ensuring environment is ready ==="
 if ! command -v huggingface-cli >/dev/null 2>&1; then
   echo "huggingface-cli not found. Installing huggingface_hub[cli] via pip3..."
-  python3 -m pip install --user "huggingface_hub[cli]"
+  python3 -m pip install --user "huggingface_hub[cli]" --break-system-packages
   
   # Ensure user's local bin is in PATH
   export PATH="${HOME}/.local/bin:${PATH}"
