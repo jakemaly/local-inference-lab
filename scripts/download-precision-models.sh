@@ -37,15 +37,15 @@ echo "=== 3. Downloading Q5_K_S target model ==="
   --local-dir "${PRECISION_DIR}"
 
 echo "=== 4. Downloading Q4_K_M DFlash drafter model ==="
-# Download Qwen3.6-27B-DFlash-Q4_K_M.gguf from spiritbuun/Qwen3.6-27B-DFlash-GGUF
-"${HF_CMD}" download spiritbuun/Qwen3.6-27B-DFlash-GGUF Qwen3.6-27B-DFlash-Q4_K_M.gguf \
+# Download dflash-draft-3.6-q4_k_m.gguf from spiritbuun/Qwen3.6-27B-DFlash-GGUF
+"${HF_CMD}" download spiritbuun/Qwen3.6-27B-DFlash-GGUF dflash-draft-3.6-q4_k_m.gguf \
   --local-dir "${PRECISION_DIR}"
 
 echo "=== 5. Verification ==="
 echo "Checking model files in ${PRECISION_DIR}:"
 ls -lh "${PRECISION_DIR}"
 
-if [[ -f "${PRECISION_DIR}/Qwen3.6-27B-Q5_K_S.gguf" && -f "${PRECISION_DIR}/Qwen3.6-27B-DFlash-Q4_K_M.gguf" ]]; then
+if [[ -f "${PRECISION_DIR}/Qwen3.6-27B-Q5_K_S.gguf" && -f "${PRECISION_DIR}/dflash-draft-3.6-q4_k_m.gguf" ]]; then
   echo "✓ Both models successfully downloaded to ${PRECISION_DIR}."
 else
   echo "✗ Error: One or more model files are missing." >&2

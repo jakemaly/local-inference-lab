@@ -34,7 +34,7 @@ for arg in "$@"; do
 done
 
 MODEL_TARGET_PATH="/home/hermes/llama/models/precision/Qwen3.6-27B-Q5_K_S.gguf"
-MODEL_DRAFTER_PATH="/home/hermes/llama/models/precision/Qwen3.6-27B-DFlash-Q4_K_M.gguf"
+MODEL_DRAFTER_PATH="/home/hermes/llama/models/precision/dflash-draft-3.6-q4_k_m.gguf"
 UNIT_FILE="/etc/systemd/system/llama-server-bee.service"
 
 echo "=== Phase 3 BeeLlama Precision Validation ==="

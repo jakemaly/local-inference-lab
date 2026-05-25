@@ -19,7 +19,7 @@ Environment="LD_LIBRARY_PATH=/home/hermes/llama/beellama.cpp/build/bin"
 #   Maintains loopback-only routing on 127.0.0.1:8082 for validation.
 ExecStart=/home/hermes/llama/beellama.cpp/build/bin/llama-server \
   -m /home/hermes/llama/models/precision/Qwen3.6-27B-Q5_K_S.gguf \
-  --spec-draft-model /home/hermes/llama/models/precision/Qwen3.6-27B-DFlash-Q4_K_M.gguf \
+  --spec-draft-model /home/hermes/llama/models/precision/dflash-draft-3.6-q4_k_m.gguf \
   --spec-type dflash \
   --spec-dflash-cross-ctx 1024 \
   --spec-draft-ngl all \
