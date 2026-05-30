@@ -1,26 +1,39 @@
-# Honey, we have inference at home
+# We have inference at home
 
 A reproducible local AI infrastructure project exploring high-performance inference, autonomous agent workflows, memory systems, and remote development on consumer hardware. 
 
 ### What is this?
 
-This repository documents the design and evolution of an ongoing local inference machine hosted in my bedroom. It will include write-ups on my notes and processes, sample code, configurations, and benchmarks.
+This repository documents the learning, design and evolution of an ongoing local inference machine hosted in my bedroom. It will include write-ups on my notes and processes, sample code, configurations, and benchmarks.
 
 ## Why this project?
-There are many reasons as to why an increasing number of people are moving to local LLM setups, such as privacy, control, or long-term costs. 
 
-My most compelling reasoning is **autonomy and sovereignty.** 
+There are many reasons as to why an increasing number of people are moving to local LLM setups, such as privacy, control, or long-term costs. My most compelling reasonings are **autonomy and sovereignty.** 
 
-**Autonomy** means that your systems are yours. You can run them on your own accords, and without anyone's permission.
-
-**Sovereignty** means that you have the power over your systems. If OpenAI wants to censor outputs, raise prices, or disappear, you aren't affected.
-
-Frontier labs like Anthropic and OpenAI are going to war for who can take the whole pie, not just a slice. Moving to local infrastructure means maintaining digital independence.
-
+1. **Autonomy** means that your systems are yours. You can run them on your own accords, and without anyone's permission.
+2. **Sovereignty** means that you have the power over your systems. If OpenAI wants to censor outputs, raise prices, or disappear, you aren't affected.
 
 ## Hardware
+**NVIDIA RTX 3090** (upgraded from RTX 2060)
 
-## Architecture
+> *Why the upgrade? The 3090 has 24GB of Video RAM (VRAM), compared to the 2060's 8GB. This makes a world of difference in terms of the model size you can fit on your hardware.*
+
+**Intel i7-9700k, 2x16GB RAM, MSI Z390-A Pro**
+
+> *These are important to keep in the back of the mind, but we want to keep our model running on GPU, not to offload to CPU RAM. This is because the GPU is 22.5x faster than the CPU (936 GB/s vs 41.6 GB/s).*
+
+## Bottleneck 1: Really Big Model Weights
+Without quantization, typical models use 32-bit floating point (FP32) parameters. FP32 demands 4 bytes of memory, which adds up quick.
+
+That's way too much for our 3090. Let's see what quantization has to offer. 
+
+| Quantization | Bytes/weight | Size   | Quality       |
+|--------------|--------------|--------|---------------|
+| Q4 (INT4)    | 0.5          | ~16GB  | Good          |
+| Q8 (INT8)    | 1            | ~29GB  | Near-lossless |
+| FP32         | 4            | ~108GB | Lossless      |
+
+By switching to Q4, we represent our weights in INT4 (16 distinct values) rather than FP32 (4 billion distinct values). At runtime, we multiply the INT4 value by its scale factor to reconstitute the weight. Quantization allows for faster decoding and lower VRAM requirements, but results in less precision per weight. Now, we can fit a 27B model on our 3090!
 
 ## Implementation
 
