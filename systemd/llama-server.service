@@ -1,6 +1,6 @@
 [Unit]
-Description=Llama Server Service (Qwen3.6-27B Heretic IQ4_NL + DFlash)
-Documentation=file:///home/hermes/club-3090/docs/%23%20Quickstart%3A%20Qwen%203.md
+Description=Llama Server Service (Qwen3.6-27B MTP Q4_K_M - Native llama.cpp)
+Documentation=file:///home/hermes/club-3090/docs/mtp-native-profile.md
 After=network.target
 
 [Service]
@@ -8,39 +8,35 @@ User=hermes
 WorkingDirectory=/home/hermes/llama
 
 Environment="GGML_CUDA_GRAPH_OPT=0"
-Environment="LD_LIBRARY_PATH=/home/hermes/llama/beellama.cpp/build/bin"
+Environment="LD_LIBRARY_PATH=/home/hermes/llama/llama.cpp/build/bin"
 
-# Heretic production profile (port 8080):
-#   DavidAU Heretic IQ4_NL target + DFlash drafter.
-#   128K YaRN ctx (scale 4, orig 32768), temp 1.0, turbo4/turbo3_tcq KV.
-ExecStart=/home/hermes/llama/beellama.cpp/build/bin/llama-server \
-  -m /home/hermes/llama/models/heretic/Qwen3.6-27B-NEO-CODE-HERE-2T-OT-IQ4_NL.gguf \
-  --spec-draft-model /home/hermes/llama/models/precision/dflash-draft-3.6-q4_k_m.gguf \
-  --spec-type dflash \
-  --spec-dflash-cross-ctx 1024 \
-  --spec-draft-ngl all \
+# MTP Native Profile (port 8080):
+#   Qwen3.6-27B Unsloth MTP Q4_K_M with built-in draft-mtp speculative decoding.
+#   200K context (fills ~183K with headroom), q4_0 K/V cache.
+#   Native GGUF template, reasoning off.
+#   Simpler, more consistent than BeeLlama/DFlash - no complex drafter model needed.
+ExecStart=/home/hermes/llama/llama.cpp/build/bin/llama-server \
+  --host 0.0.0.0 \
+  --port 8080 \
+  -m /home/hermes/llama/models/unsloth-mtp-q4km/Qwen3.6-27B-Q4_K_M.gguf \
+  -c 200000 \
+  -b 4096 \
+  -ub 512 \
   -ngl 99 \
   -fa on \
-  --kv-unified \
-  -b 2048 \
-  -ub 256 \
-  --ctx-size 131072 \
-  --rope-scaling yarn \
-  --rope-scale 4 \
-  --yarn-orig-ctx 32768 \
-  --cache-type-k turbo4 \
-  --cache-type-v turbo3_tcq \
-  --cache-ram 0 \
+  --cache-type-k q4_0 \
+  --cache-type-v q4_0 \
   -np 1 \
+  --spec-type draft-mtp \
+  --spec-draft-n-max 2 \
   --jinja \
   --reasoning off \
   --reasoning-format deepseek \
-  --temp 1.0 \
+  --temp 0.6 \
+  --top-p 0.95 \
   --top-k 20 \
   --min-p 0.0 \
   --repeat-penalty 1.0 \
-  --port 8080 \
-  --host 127.0.0.1 \
   --metrics \
   --log-timestamps \
   --log-prefix \
