@@ -1,0 +1,51 @@
+[Unit]
+Description=Llama Server Service (Qwen3.6-27B MTP Q4_K_M - Native llama.cpp)
+Documentation=file:///home/hermes/club-3090/docs/mtp-native-profile.md
+After=network.target
+
+[Service]
+User=hermes
+WorkingDirectory=/home/hermes/llama
+
+Environment="GGML_CUDA_GRAPH_OPT=0"
+Environment="LD_LIBRARY_PATH=/home/hermes/llama/llama.cpp/build/bin"
+
+# MTP Native Profile (port 8080):
+#   Qwen3.6-27B Unsloth MTP Q4_K_M with built-in draft-mtp speculative decoding.
+#   200K context (fills ~183K with headroom), q4_0 K/V cache.
+#   Native GGUF template, reasoning off.
+#   Simpler, more consistent than BeeLlama/DFlash - no complex drafter model needed.
+ExecStart=/home/hermes/llama/llama.cpp/build/bin/llama-server \
+  --host 0.0.0.0 \
+  --port 8080 \
+  -m /home/hermes/llama/models/unsloth-mtp-q4km/Qwen3.6-27B-Q4_K_M.gguf \
+  -c 200000 \
+  -b 4096 \
+  -ub 512 \
+  -ngl 99 \
+  -fa on \
+  --cache-type-k q4_0 \
+  --cache-type-v q4_0 \
+  -np 1 \
+  --spec-type draft-mtp \
+  --spec-draft-n-max 2 \
+  --jinja \
+  --reasoning off \
+  --reasoning-format deepseek \
+  --temp 0.6 \
+  --top-p 0.95 \
+  --top-k 20 \
+  --min-p 0.0 \
+  --repeat-penalty 1.0 \
+  --metrics \
+  --log-timestamps \
+  --log-prefix \
+  --log-colors off
+
+Restart=always
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

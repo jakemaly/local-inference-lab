@@ -1,3 +1,4 @@
+
 # We have inference at home
 
 A reproducible local AI infrastructure project exploring high-performance inference, autonomous agent workflows, memory systems, and remote development on consumer hardware. 
@@ -6,12 +7,7 @@ A reproducible local AI infrastructure project exploring high-performance infere
 
 This repository documents the learning, design and evolution of an ongoing local inference machine hosted in my bedroom. It will include write-ups on my notes and processes, sample code, configurations, and benchmarks.
 
-## Why this project?
-
-There are many reasons as to why an increasing number of people are moving to local LLM setups, such as privacy, control, or long-term costs. My most compelling reasonings are **autonomy and sovereignty.** 
-
-1. **Autonomy** means that your systems are yours. You can run them on your own accords, and without anyone's permission.
-2. **Sovereignty** means that you have the power over your systems. If OpenAI wants to censor outputs, raise prices, or disappear, you aren't affected.
+Find the [current stable server config here.](systemd/llama-server.service)
 
 ## Hardware
 
@@ -25,9 +21,7 @@ There are many reasons as to why an increasing number of people are moving to lo
 
 ## Bottleneck 1: Really Big Model Weights
 
-Without quantization, typical models use 32-bit floating point (FP32) parameters. FP32 demands 4 bytes of memory, which adds up quick.
-
-That's way too much for our 3090. Let's see what quantization has to offer. 
+Without quantization, typical models use 32-bit floating point (FP32) parameters. FP32 demands 4 bytes of memory, which adds up quick. Let's see what quantization has to offer. 
 
 
 | Quantization | Bytes/weight | Size   | Quality       |
@@ -37,7 +31,37 @@ That's way too much for our 3090. Let's see what quantization has to offer.
 | FP32         | 4            | ~108GB | Lossless      |
 
 
-By switching to Q4, we represent our weights in INT4 (16 distinct values) rather than FP32 (4 billion distinct values). At runtime, we multiply the INT4 value by its scale factor to reconstitute the weight. Quantization allows for faster decoding and lower VRAM requirements, but results in less precision per weight. Now, we can fit a 27B model on our 3090!
+By switching to Q4, we represent our weights in INT4 (16 distinct values) rather than FP32 (4 billion distinct values). At runtime, we multiply the INT4 value by the block's scale factor to reconstitute the weight. Quantization allows for faster decoding and lower VRAM requirements, but results in less precision per weight. Now, we can fit a 27B model on our RTX 3090!
+
+## Bottleneck 2: Really Big Context Overflow
+
+The [attention mechanism](https://arxiv.org/pdf/1706.03762) for LLMs uses past tokens to decide what's relevant and what isn't.  When generating a new token in sequence, it queries (Q) past tokens whose meanings are stored as a key-value (KV) pair. As we build our context windows, more tokens are added to the storage (KV cache). 
+
+Similarly to weights, KV vectors are rich. Using a similar quantization strategy (FP32 -> INT4) as we used for the weights, we can avoid overflowing memory and actually run large context windows.
+
+> This setup serving Qwen3.6 27B can effectively run 262k context windows with q4_0. I experimented with TurboQuant, but Qwen + llama.cpp has great cache efficiency with simpler quantizations.
+
+## Bottleneck 3: Kinda Slow Generation Speeds
+
+Language models generate tokens sequentially, known as autoregression.
+
+ - The quick brown fox *[jumps]*
+ - The quick brown fox **jumps** *[over]* 
+ - The quick brown fox **jumps over** *[the]* 
+
+This is a tad slow, so what can we do?
+
+Imagine you wanted to write an essay, and you recruit your younger, faster brother to put the words to paper. Your brother is still pretty capable, so he can draft the words you'd *probably* want to write, and much faster than you could.
+
+ If he writes something you wouldn't at word 4, you just accept what he wrote from words 1-3. 
+ 
+ - The quick brown fox *[jumps over the ~~funny~~]* 
+ - The quick brown fox **jumps over the**  *[lazy dog]* 
+ - The quick brown fox **jumps over the lazy dog** ✅
+
+This is the essence of speculative decoding. Using your base model + a  draft model (smaller, faster model) allows for much faster inference since models can process multiple tokens in parallel, but only generate one at a time.
+
+Multi-token prediction (MTP) bakes the draft model into the base model, sharing the "training knowledge". This is like instead of having your brother write your essay, you have yourself (but younger and faster) write the essay. This makes MTP a great, accurate option for local inference setups.
 
 ## Implementation
 
