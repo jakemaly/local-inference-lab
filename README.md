@@ -44,20 +44,22 @@ Similarly to weights, KV vectors are rich. Using a similar quantization strategy
 ## Bottleneck 3: Kinda Slow Generation Speeds
 
 Language models generate tokens sequentially, known as autoregression.
+ - The quick brown *[fox]*
+ - The quick brown **fox** *[jumps]*
+ - The quick brown **fox jumps** *[over]* 
 
- - The quick brown fox *[jumps]*
- - The quick brown fox **jumps** *[over]* 
- - The quick brown fox **jumps over** *[the]* 
 
 This is a tad slow, so what can we do?
 
-Imagine you wanted to write an essay, and you recruit your younger, faster brother to put the words to paper. Your brother is still pretty capable, so he can draft the words you'd *probably* want to write, and much faster than you could.
+Imagine you wanted to write an essay, and you recruit your younger, faster brother to put the words to paper.
 
- If he writes something you wouldn't at word 4, you just accept what he wrote from words 1-3. 
+ Your brother is pretty capable, and he can draft the words you'd *probably* want to write much faster than you could.
+
+ If he writes something you wouldn't at word 4, you just accept what he wrote from words 1-3, and write word 4 yourself. 
  
- - The quick brown fox *[jumps over the ~~funny~~]* 
- - The quick brown fox **jumps over the**  *[lazy dog]* 
- - The quick brown fox **jumps over the lazy dog** ✅
+ - The quick brown *[fox jumps over ~~its~~]* 
+ - The quick brown **fox jumps over** ~~its~~  ***the ✍️***  *[lazy dog]* 
+ - The quick brown **fox jumps over the lazy dog** 
 
 This is the essence of speculative decoding. Using your base model + a  draft model (smaller, faster model) allows for much faster inference since models can process multiple tokens in parallel, but only generate one at a time.
 
