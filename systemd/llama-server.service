@@ -21,7 +21,7 @@ ExecStart=/home/hermes/llama/llama.cpp/build/bin/llama-server \
   -m /home/hermes/llama/models/unsloth-mtp-q4km/Qwen3.6-27B-Q4_K_M.gguf \
   -c 200000 \
   -b 4096 \
-  -ub 512 \
+  -ub 1024 \
   -ngl 99 \
   -fa on \
   --cache-type-k q4_0 \
