@@ -1,10 +1,5 @@
 
 # We have inference at home
-
-A reproducible local AI infrastructure project exploring high-performance inference, autonomous agent workflows, memory systems, and remote development on consumer hardware. 
-
-### What is this?
-
 This repository documents the learning, design and evolution of an ongoing local inference machine hosted in my bedroom. It will include write-ups on my notes and processes, sample code, configurations, and benchmarks.
 
 Find the [current stable server config here.](systemd/llama-server.service)
@@ -48,9 +43,9 @@ Similarly to weights, KV vectors are very precise. Using a similar quantization 
 ## Bottleneck 3: Kinda Slow Generation Speeds
 
 Language models generate tokens sequentially, known as autoregression.
- - The quick brown *[fox]*
- - The quick brown **fox** *[jumps]*
- - The quick brown **fox jumps** *[over]* 
+ - The quick brown *[fox]* ...
+ - The quick brown **fox** *[jumps]* ...
+ - The quick brown **fox jumps** *[over]*  ...
 
 
 This is a tad slow, so what can we do?
@@ -61,8 +56,8 @@ Imagine you wanted to write an essay, and you recruit your younger, faster broth
 
  If he writes something you wouldn't at word 4, you just accept what he wrote from words 1-3, and write **>> word4** yourself. 
  
- - The quick brown *[fox jumps over ~~its~~]* 
- - The quick brown **fox jumps over** ~~its~~  ***>> the***  *[lazy dog]* 
+ - The quick brown *[fox jumps over ~~its~~]* ...
+ - The quick brown **fox jumps over** ~~its~~  ***>> the***  *[lazy dog]* ...
  - The quick brown **fox jumps over the lazy dog** ✅ 
 
 This is the essence of speculative decoding. Using your base model + a  draft model (smaller, faster model) allows for much faster inference since models can process multiple tokens in parallel, but only generate one at a time.
@@ -70,8 +65,15 @@ This is the essence of speculative decoding. Using your base model + a  draft mo
 Multi-token prediction (MTP) bakes the draft model into the base model, sharing the "training knowledge". This is like instead of having your brother write your essay, you have yourself (but younger and faster) write the essay. This makes MTP a great, accurate option for local inference setups.
 
 ## Implementation
+Replaced RTX 2060 with RTX 3090, installed new PSU (500W -> 1000W)
 
-## What I learned
+Experimented with WSL2, decided to dual-boot Linux instead
+
+Installed inference engine ([llama.cpp](https://github.com/ggml-org/llama.cpp) for CUDA) and [downloaded model weights](https://huggingface.co), and wrote config script
+
+Served via Tailscale for SSH from anywhere
+
+Harnessed through [custom Pi setup](https://github.com/jakemaly/pi) for coding
 
 ## Experiments and benchmarks
 
