@@ -6,10 +6,6 @@ set -euo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 UNIT_SRC="${ROOT}/systemd/llama-server.service"
 UNIT_DST="/etc/systemd/system/llama-server.service"
-BEE_SRC="${ROOT}/systemd/llama-server-bee.service"
-BEE_DST="/etc/systemd/system/llama-server-bee.service"
-HERETIC_SRC="${ROOT}/systemd/llama-server-heretic.service"
-HERETIC_DST="/etc/systemd/system/llama-server-heretic.service"
 
 if [[ ! -f "${UNIT_SRC}" ]]; then
   echo "ERROR: missing ${UNIT_SRC}" >&2
@@ -19,16 +15,5 @@ fi
 echo "Installing ${UNIT_SRC} -> ${UNIT_DST}"
 sudo cp "${UNIT_SRC}" "${UNIT_DST}"
 
-if [[ -f "${BEE_SRC}" ]]; then
-  echo "Installing sibling unit ${BEE_SRC} -> ${BEE_DST}"
-  sudo cp "${BEE_SRC}" "${BEE_DST}"
-fi
-
-if [[ -f "${HERETIC_SRC}" ]]; then
-  echo "Installing sibling unit ${HERETIC_SRC} -> ${HERETIC_DST}"
-  sudo cp "${HERETIC_SRC}" "${HERETIC_DST}"
-fi
-
 sudo systemctl daemon-reload
 echo "Done. Reloaded systemd units."
-
