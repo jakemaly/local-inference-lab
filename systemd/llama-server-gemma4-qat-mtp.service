@@ -10,16 +10,19 @@ Environment="GGML_CUDA_GRAPH_OPT=0"
 Environment="LD_LIBRARY_PATH=/home/hermes/llama/llama.cpp/build/bin"
 
 # Gemma 4 31B QAT MTP profile (port 8080):
-#   Base: unsloth QAT UD-Q4_K_XL (16.1 GB) + MTP Q4_0 draft head (267 MB).
+#   Base: unsloth QAT UD-Q4_K_XL (16.1 GB) + MTP Q4_0 drafter (267 MB).
+#   Drafter: mtp-gemma-4-31B-it.gguf (Unsloth's root-level MTP GGUF — per Unsloth docs).
 #   64K context (safe on 24 GB; weights ~16.5 GB + q4_0 KV ~1.5 GB + overhead ~1 GB ≈ 19 GB).
 #   q4_0 K/V cache, native GGUF jinja template, reasoning off.
 #   Gemma defaults: temp 1.0, top-p 0.95, top-k 64.
-#   MTP n=2 via external draft GGUF (--spec-draft-model + --spec-type draft-mtp).
+#   MTP n=4 via external draft GGUF (--spec-draft-model + --spec-type draft-mtp).
+#   NOTE: when using -hf instead of local files, llama.cpp auto-discovers the drafter
+#         at the repo root and --spec-draft-model is NOT needed.
 ExecStart=/home/hermes/llama/llama.cpp/build/bin/llama-server \
   -m /home/hermes/llama/models/gemma-4-31b-qat-mtp/gemma-4-31B-it-qat-UD-Q4_K_XL.gguf \
-  --spec-draft-model /home/hermes/llama/models/gemma-4-31b-qat-mtp/MTP/gemma-4-31B-it-Q4_0-MTP.gguf \
+  --spec-draft-model /home/hermes/llama/models/gemma-4-31b-qat-mtp/mtp-gemma-4-31B-it.gguf \
   --spec-type draft-mtp \
-  --spec-draft-n-max 2 \
+  --spec-draft-n-max 4 \
   -c 65536 \
   -b 2048 \
   -ub 512 \

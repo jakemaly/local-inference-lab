@@ -12,7 +12,7 @@ echo "=== Gemma 4 QAT MTP Start ==="
 
 # 1. Check model exists
 BASE_MODEL="${ROOT}/models/gemma-4-31b-qat-mtp/gemma-4-31B-it-qat-UD-Q4_K_XL.gguf"
-DRAFT_MODEL="${ROOT}/models/gemma-4-31b-qat-mtp/MTP/gemma-4-31B-it-Q4_0-MTP.gguf"
+DRAFT_MODEL="${ROOT}/models/gemma-4-31b-qat-mtp/mtp-gemma-4-31B-it.gguf"
 if [[ ! -f "${BASE_MODEL}" ]] || [[ ! -f "${DRAFT_MODEL}" ]]; then
   echo "Model not found. Downloading..."
   bash "${ROOT}/scripts/download-gemma4-qat-mtp.sh"

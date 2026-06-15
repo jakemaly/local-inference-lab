@@ -6,7 +6,7 @@ set -euo pipefail
 MODEL_DIR="/home/hermes/llama/models/gemma-4-31b-qat-mtp"
 REPO="unsloth/gemma-4-31B-it-qat-GGUF"
 BASE_FILE="gemma-4-31B-it-qat-UD-Q4_K_XL.gguf"
-MTP_FILE="MTP/gemma-4-31B-it-Q4_0-MTP.gguf"
+MTP_FILE="mtp-gemma-4-31B-it.gguf"
 
 mkdir -p "${MODEL_DIR}"
 
