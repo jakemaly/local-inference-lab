@@ -95,4 +95,25 @@ Both models were run via the `pi` terminal coding harness (pointing to their res
 | **Qwen3.6 27B MTP** | `eval-qwen` | **PASS** | **RESOLVED (100%)** | Added `__slots__ = ()` to the `Printable` base class in `sympy/core/_print_helpers.py` to prevent Symbol subclasses from obtaining `__dict__`. |
 | **Gemma 4 31B QAT MTP** | `eval-gemma` | **PASS** | **RESOLVED (100%)** | Added `__slots__ = ()` to the `Printable` base class in `sympy/core/_print_helpers.py` to prevent Symbol subclasses from obtaining `__dict__`. |
 
+### 3. SWE-bench Verified Batch Evaluation (5 Instances)
+
+To obtain a more statistically significant capability measurement and avoid single-test bias, we evaluated both models on a batch of 5 instances from the `SWE-bench Verified` suite:
+1. `sympy__sympy-20590` (slots regression)
+2. `sympy__sympy-24443` (permutation group homomorphism check)
+3. `sympy__sympy-13974` (tensor product power evaluation)
+4. `sympy__sympy-14248` (matrix symbols difference printer)
+5. `sympy__sympy-13877` (matrix determinant NaN comparison Bareiss algorithm)
+
+| Model | Total | Resolved (PASS) | Unresolved (FAIL) | Empty Patch (OOM/Timeout) | Docker Build Error |
+|---|---|---|---|---|---|
+| **Qwen3.6 27B MTP** | 5 | **1** (`sympy__sympy-24443`) | **1** (`sympy__sympy-13974`) | **2** (`sympy__sympy-13877`, `sympy__sympy-14248`) | **1** (`sympy__sympy-20590`) |
+| **Gemma 4 31B QAT MTP** | 5 | **1** (`sympy__sympy-20590`) | **2** (`sympy__sympy-13877`, `sympy__sympy-14248`) | **0** | **2** (`sympy__sympy-13974`, `sympy__sympy-24443`) |
+
+**Key Observations:**
+* **Gemma 4 31B QAT MTP** successfully generated patches for all 5 instances without any server-side OOMs or timeouts, showing superior context management stability on the RTX 3090.
+* **Qwen3.6 27B MTP** resolved `sympy__sympy-24443` correctly but hit model loading / VRAM context limits resulting in empty predictions (503 timeouts) on two instances.
+* Both models struggled to completely resolve complex mathematical logic bugs where multiple files or tests are affected.
+* Docker build errors were caused by intermittent IPv6 connection timeouts to Docker Hub during evaluation container image pulls on the host machine.
+
+
 

@@ -5,4 +5,5 @@ models/precision/
 models/unsloth-mtp-q4km/
 beellama.cpp/
 scratch/
+logs/
 
