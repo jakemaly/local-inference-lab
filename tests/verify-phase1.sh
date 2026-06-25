@@ -54,10 +54,10 @@ check_preflight() {
     fail "llama-server binary missing" "Build: cd /home/hermes/llama/llama.cpp && cmake --build build -j"
     ok=0
   fi
-  if [[ -f /home/hermes/llama/models/Qwen3.6-27B-Q4_K_M.gguf ]]; then
+  if [[ -f /home/hermes/llama/models/unsloth-mtp-q4km/Qwen3.6-27B-Q4_K_M.gguf ]]; then
     pass "GGUF model present"
   else
-    fail "model missing at /home/hermes/llama/models/Qwen3.6-27B-Q4_K_M.gguf" "Download via hf download"
+    fail "model missing at models/unsloth-mtp-q4km/Qwen3.6-27B-Q4_K_M.gguf" "Run: bash scripts/download-mtp-model.sh"
     ok=0
   fi
   if [[ -f "${REPO_UNIT}" ]]; then

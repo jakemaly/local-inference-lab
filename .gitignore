@@ -1,0 +1,9 @@
+models/gemma-4-31b-qat-mtp/
+models/Qwen3.6-27B-Q4_K_M.gguf
+models/heretic/
+models/precision/
+models/unsloth-mtp-q4km/
+beellama.cpp/
+scratch/
+logs/
+
