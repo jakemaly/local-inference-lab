@@ -82,7 +82,7 @@ Harnessed through [custom Pi setup](https://github.com/jakemaly/pi) for coding
 
 ## Experiments and benchmarks
 
-A complete evaluation sweep of Qwen3.6 27B MTP and Gemma 4 31B QAT MTP. Native performance is benched using `llama-bench` (from native llama.cpp build). Agentic capability is evaluated via **SWE-bench** on the `sympy__sympy-20590` instance using the `pi` coding harness (with local llama.cpp endpoints).
+A complete evaluation sweep of Qwen3.6 27B MTP and Gemma 4 31B QAT MTP. Native performance is benched using `llama-bench` (from native llama.cpp build). Agentic capability is evaluated via a 5-instance batch from the **SWE-bench Verified** suite using the `pi` coding harness (with local llama.cpp endpoints).
 
 ### 1. Native Llama-bench Performance (tokens/sec)
 
@@ -93,16 +93,7 @@ A complete evaluation sweep of Qwen3.6 27B MTP and Gemma 4 31B QAT MTP. Native p
 
 *Benchmarked with: `-ngl 99 -fa on -ctk q4_0 -ctv q4_0`*
 
-### 2. SWE-bench Agent Evaluation (`sympy__sympy-20590`)
-
-Both models were run via the `pi` terminal coding harness (pointing to their respective systemd `llama-server` endpoints) to solve the `sympy__sympy-20590` bug instance. Patches were graded using the official SWE-bench evaluation docker container.
-
-| Model | Run ID | Status | Resolution | Patch Details |
-|---|---|---|---|---|
-| **Qwen3.6 27B MTP** | `eval-qwen` | **PASS** | **RESOLVED (100%)** | Added `__slots__ = ()` to the `Printable` base class in `sympy/core/_print_helpers.py` to prevent Symbol subclasses from obtaining `__dict__`. |
-| **Gemma 4 31B QAT MTP** | `eval-gemma` | **PASS** | **RESOLVED (100%)** | Added `__slots__ = ()` to the `Printable` base class in `sympy/core/_print_helpers.py` to prevent Symbol subclasses from obtaining `__dict__`. |
-
-### 3. SWE-bench Verified Batch Evaluation (5 Instances)
+### 2. SWE-bench Verified Batch Evaluation (5 Instances)
 
 To obtain a more statistically significant capability measurement and avoid single-test bias, we evaluated both models on a batch of 5 instances from the `SWE-bench Verified` suite:
 1. `sympy__sympy-20590` (slots regression)
@@ -121,6 +112,7 @@ To obtain a more statistically significant capability measurement and avoid sing
 * **Qwen3.6 27B MTP** resolved `sympy__sympy-24443` correctly but hit model loading / VRAM context limits resulting in empty predictions (503 timeouts) on two instances.
 * Both models struggled to completely resolve complex mathematical logic bugs where multiple files or tests are affected.
 * Docker build errors were caused by intermittent IPv6 connection timeouts to Docker Hub during evaluation container image pulls on the host machine.
+
 
 
 
