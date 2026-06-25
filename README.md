@@ -70,8 +70,15 @@ This is the essence of speculative decoding. Using your base model + a  draft mo
 Multi-token prediction (MTP) bakes the draft model into the base model, sharing the "training knowledge". This is like instead of having your brother write your essay, you have yourself (but younger and faster) write the essay. This makes MTP a great, accurate option for local inference setups.
 
 ## Implementation
+Replaced RTX 2060 with RTX 3090, installed new PSU (500W -> 1000W)
 
-## What I learned
+Experimented with WSL2, decided to dual-boot Linux instead
+
+Installed inference engine ([llama.cpp](https://github.com/ggml-org/llama.cpp) for CUDA) and [downloaded model weights](https://huggingface.co), and wrote config script
+
+Served via Tailscale for SSH from anywhere
+
+Harnessed through [custom Pi setup](https://github.com/jakemaly/pi) for coding
 
 ## Experiments and benchmarks
 
